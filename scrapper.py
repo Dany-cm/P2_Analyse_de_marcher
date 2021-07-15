@@ -2,16 +2,14 @@ import requests
 import csv
 from bs4 import BeautifulSoup
 
-url = 'http://books.toscrape.com/catalogue/psycho-sanitarium-psycho-15_628/index.html'
-response = requests.get(url)
-
-def saveBooksInfos():
+def saveBooks(url_book, write):
+    response = requests.get(url_book)
 
     if response.ok:
         soup = BeautifulSoup(response.text, 'lxml')
 
         # extract all informations and remove html tags with .text
-        product_page_url = url
+        product_page_url = url_book
         information = soup.find('table', attrs={'class': 'table-striped'})
         universal_product_code = information.find_all('td')[0].text
         title = soup.find('h1').text
@@ -23,14 +21,32 @@ def saveBooksInfos():
         review_rating = information.find_all('td')[6].text
         image_src = soup.find("div", {"class": "item active"}).find("img")
         image_url = image_src["src"]
+        print('writing book info for ' + title)
+
+    with open("P2_01_codesource.csv", "a", encoding="utf8", newline='') as outf:
+        write = csv.writer(outf)
+        info = [product_page_url, universal_product_code, title, price_including_tax, price_excluding_tax,
+                number_available, product_description, category, review_rating, image_url]
+
+        # write header first and then info into our file
+        write.writerow(info)
+
+def get_book_url(url_cat, write):
+    response = requests.get(url_cat)
+    soup = BeautifulSoup(response.text, 'lxml')
 
     with open("P2_01_codesource.csv", "w", encoding="utf8", newline='') as outf:
         write = csv.writer(outf)
         header = ['product_page_url', 'universal_product_code', 'title', 'price_including_tax', 'price_excluding_tax',
                 'number_available', 'product_description', 'category', 'review_rating', 'image_url\n']
-        info = [product_page_url, universal_product_code, title, price_including_tax, price_excluding_tax,
-                number_available, product_description, category, review_rating, image_url]
 
-        # write header first and then info into our file
+        # write header
         write.writerow(header)
-        write.writerow(info)
+
+    # loop to get all the book url in the category
+    for books in soup.find_all('div', {'class': 'image_container'}):
+        url_book = books.find('a', href= True)
+        url_book = url_book['href'].split('..')[3]
+        url_book = 'https://books.toscrape.com/catalogue' + url_book
+        print(url_book)
+        saveBooks(url_book, write)
