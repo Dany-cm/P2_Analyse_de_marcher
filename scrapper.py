@@ -2,7 +2,7 @@ import requests
 import csv
 from bs4 import BeautifulSoup
 
-def saveBook(url_book):
+def saveBook(url_book, category_name):
     response = requests.get(url_book)
 
     if response.ok:
@@ -23,7 +23,7 @@ def saveBook(url_book):
         image_url = image_src["src"]
 
     # save info in a csv file
-    with open("P2_01_codesource.csv", "a", encoding="utf8", newline='') as outf:
+    with open(category_name + '.csv', 'a', encoding='utf8', newline='') as outf:
         write = csv.writer(outf)
         info = [product_page_url, universal_product_code, title, price_including_tax, price_excluding_tax,
                 number_available, product_description, category, review_rating, image_url]
@@ -32,16 +32,18 @@ def saveBook(url_book):
         write.writerow(info)
 
 # get all book from the category
-def get_all_book_from_cat(url_cat):
-    url_cat_page = url_cat + 'index.html'
+def get_all_book_from_cat(url_cat, category_name):
+    url_cat_page = url_cat
 
     # save info in a csv file
-    with open("P2_01_codesource.csv", "w", encoding="utf8", newline='') as outf:
+    with open(category_name + '.csv', "w", encoding="utf8", newline='') as outf:
         write = csv.writer(outf)
         header = ['product_page_url', 'universal_product_code', 'title', 'price_including_tax', 'price_excluding_tax',
                 'number_available', 'product_description', 'category', 'review_rating', 'image_url\n']
         # write header
         write.writerow(header)
+
+    print('retrieving all books from cat ' + url_cat_page)
 
     # loop in all page
     while True:
@@ -53,7 +55,7 @@ def get_all_book_from_cat(url_cat):
             url_book = books.find('a', href= True)
             url_book = url_book['href'].split('..')[3]
             url_book = 'https://books.toscrape.com/catalogue' + url_book
-            saveBook(url_book)
+            saveBook(url_book, category_name)
 
         # retrieve next page url
         next_page = soup.find_all('li', {'class': 'next'})
@@ -64,3 +66,16 @@ def get_all_book_from_cat(url_cat):
             print(url_cat_page)
         else:
             break
+
+def get_all_category(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'lxml')
+
+    # loop to get all the book url in the category
+    categories = soup.find("ul", class_="nav nav-list").li.ul.find_all("li")
+    for category in categories:
+        link = category.find('a')['href']
+        print(link)
+        category_name = category.find('a').text.strip()
+        print(category_name)
+        get_all_book_from_cat(url + link, category_name)

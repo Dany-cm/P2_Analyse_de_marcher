@@ -1,6 +1,6 @@
-from scrapper import get_all_book_from_cat
+from scrapper import get_all_book_from_cat, get_all_category
 
-url = 'https://books.toscrape.com/catalogue/category/books/horror_31/'
+url = 'https://books.toscrape.com/'
 
 if __name__ == "__main__":
-    get_all_book_from_cat(url)
+    print(get_all_category(url))
