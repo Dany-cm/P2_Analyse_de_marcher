@@ -1,6 +1,11 @@
 import requests
 import csv
+import os
 from bs4 import BeautifulSoup
+
+folder_csv =  'csv'
+if not os.path.exists(folder_csv):
+    os.makedirs(folder_csv)
 
 def saveBook(url_book, category_name):
     response = requests.get(url_book)
@@ -18,12 +23,12 @@ def saveBook(url_book, category_name):
         number_available = information.find_all('td')[5].text
         product_description = soup.find_all('p')[3].text
         category = soup.find_all('li')[2].text[1:]
-        review_rating = information.find_all('td')[6].text
+        review_rating = soup.find('p', class_='star-rating').get('class')[1]
         image_src = soup.find("div", {"class": "item active"}).find("img")
         image_url = image_src["src"]
 
     # save info in a csv file
-    with open(category_name + '.csv', 'a', encoding='utf8', newline='') as outf:
+    with open(folder_csv + '/' + category_name + '.csv', 'a', encoding='utf8', newline='') as outf:
         write = csv.writer(outf)
         info = [product_page_url, universal_product_code, title, price_including_tax, price_excluding_tax,
                 number_available, product_description, category, review_rating, image_url]
@@ -36,7 +41,7 @@ def get_all_book_from_cat(url_cat, category_name):
     url_cat_page = url_cat
 
     # save info in a csv file
-    with open(category_name + '.csv', "w", encoding="utf8", newline='') as outf:
+    with open(folder_csv + '/' + category_name + '.csv', "w", encoding="utf8", newline='') as outf:
         write = csv.writer(outf)
         header = ['product_page_url', 'universal_product_code', 'title', 'price_including_tax', 'price_excluding_tax',
                 'number_available', 'product_description', 'category', 'review_rating', 'image_url\n']
@@ -63,7 +68,6 @@ def get_all_book_from_cat(url_cat, category_name):
             url_page = next_page[0].find('a', href= True)
             url_page = url_page['href']
             url_cat_page = url_cat + url_page
-            print(url_cat_page)
         else:
             break
 
@@ -71,11 +75,9 @@ def get_all_category(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'lxml')
 
-    # loop to get all the book url in the category
-    categories = soup.find("ul", class_="nav nav-list").li.ul.find_all("li")
+    # loop to get all category name
+    categories = soup.find('ul', class_='nav nav-list').li.ul.find_all('li')
     for category in categories:
         link = category.find('a')['href']
-        print(link)
         category_name = category.find('a').text.strip()
-        print(category_name)
         get_all_book_from_cat(url + link, category_name)
