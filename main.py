@@ -1,4 +1,4 @@
-from scrapper import get_all_book_from_cat, get_all_category
+from scrapper import get_all_category
 
 url = 'https://books.toscrape.com/'
 

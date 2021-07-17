@@ -1,6 +1,4 @@
-import requests
-import csv
-import os
+import requests, csv, os, urllib.request, re
 from bs4 import BeautifulSoup
 
 folder_csv =  'csv'
@@ -11,7 +9,7 @@ def saveBook(url_book, category_name):
     response = requests.get(url_book)
 
     if response.ok:
-        soup = BeautifulSoup(response.text, 'lxml')
+        soup = BeautifulSoup(response.content, 'lxml')
 
         # extract all informations and remove html tags with .text
         product_page_url = url_book
@@ -24,8 +22,19 @@ def saveBook(url_book, category_name):
         product_description = soup.find_all('p')[3].text
         category = soup.find_all('li')[2].text[1:]
         review_rating = soup.find('p', class_='star-rating').get('class')[1]
-        image_src = soup.find("div", {"class": "item active"}).find("img")
-        image_url = image_src["src"]
+        image_src = soup.find('div', {'class': 'item active'}).find('img')
+        image_url = image_src['src'].replace('../../', 'https://books.toscrape.com/')
+
+        # create images folder if it doesn't exist
+        if not os.path.exists('images'):
+                os.makedirs('images')
+
+        # use regex to clean a bit
+        title = re.sub('[^a-zA-Z0-9 \n]', '', title)
+
+        # download all images
+        with open('images/' + title + ".jpg", 'wb') as outi:
+            outi.write(urllib.request.urlopen(image_url).read())
 
     # save info in a csv file
     with open(folder_csv + '/' + category_name + '.csv', 'a', encoding='utf8', newline='') as outf:
@@ -81,3 +90,4 @@ def get_all_category(url):
         link = category.find('a')['href']
         category_name = category.find('a').text.strip()
         get_all_book_from_cat(url + link, category_name)
+    print('Extraction fini')
