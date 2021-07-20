@@ -69,8 +69,9 @@ def get_all_book_from_cat(url_cat, category_name):
     print('retrieving all books from cat ' + url_cat)
 
     # loop in all page
+    url_page = "index.html"
     while True:
-        response = requests.get(url_cat)
+        response = requests.get(url_cat + url_page)
         soup = BeautifulSoup(response.text, 'lxml')
 
         # loop to get all the book url in the category
@@ -85,7 +86,6 @@ def get_all_book_from_cat(url_cat, category_name):
         if len(next_page) != 0:
             url_page = next_page[0].find('a', href= True)
             url_page = url_page['href']
-            url_cat = url_cat + url_page
         else:
             break
 
@@ -100,7 +100,7 @@ def get_all_category(url):
     # loop to get all category name
     categories = soup.find('ul', class_='nav nav-list').li.ul.find_all('li')
     for category in categories:
-        link = category.find('a')['href']
+        link = category.find('a')['href'].replace('index.html', '')
         category_name = category.find('a').text.strip()
         get_all_book_from_cat(url + link, category_name)
     print('Extraction fini')
