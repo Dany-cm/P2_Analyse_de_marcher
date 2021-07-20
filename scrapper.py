@@ -5,6 +5,10 @@ folder_csv =  'csv'
 if not os.path.exists(folder_csv):
     os.makedirs(folder_csv)
 
+
+    ''' Save book information(url of the book, name of the book category)
+        get information for a book and download it into a csv folder
+    '''
 def saveBook(url_book, category_name):
     response = requests.get(url_book)
 
@@ -33,11 +37,13 @@ def saveBook(url_book, category_name):
         title = re.sub('[^a-zA-Z0-9 \n]', '', title)
 
         # download all images
-        with open('images/' + title + ".jpg", 'wb') as outi:
+        images = 'images/' + title + '.jpg'
+        with open(f'{images}', 'wb') as outi:
             outi.write(urllib.request.urlopen(image_url).read())
 
     # save info in a csv file
-    with open(folder_csv + '/' + category_name + '.csv', 'a', encoding='utf8', newline='') as outf:
+    dossier_csv = folder_csv + '/' + category_name + '.csv'
+    with open(f'{dossier_csv}', 'a', encoding='utf8', newline='') as outf:
         write = csv.writer(outf)
         info = [product_page_url, universal_product_code, title, price_including_tax, price_excluding_tax,
                 number_available, product_description, category, review_rating, image_url]
@@ -45,23 +51,26 @@ def saveBook(url_book, category_name):
         # write info into our file
         write.writerow(info)
 
-# get all book from the category
-def get_all_book_from_cat(url_cat, category_name):
-    url_cat_page = url_cat
 
+    ''' Get all book from category(url of the category, name of the category)
+        save headers in a csv folder and get all books from the category
+        if a category has more than one page, visit them and retrieve books
+    '''
+def get_all_book_from_cat(url_cat, category_name):
     # save info in a csv file
-    with open(folder_csv + '/' + category_name + '.csv', "w", encoding="utf8", newline='') as outf:
+    dossier_csv = folder_csv + '/' + category_name + '.csv'
+    with open(f'{dossier_csv}', "w", encoding="utf8", newline='') as outf:
         write = csv.writer(outf)
         header = ['product_page_url', 'universal_product_code', 'title', 'price_including_tax', 'price_excluding_tax',
                 'number_available', 'product_description', 'category', 'review_rating', 'image_url\n']
         # write header
         write.writerow(header)
 
-    print('retrieving all books from cat ' + url_cat_page)
+    print('retrieving all books from cat ' + url_cat)
 
     # loop in all page
     while True:
-        response = requests.get(url_cat_page)
+        response = requests.get(url_cat)
         soup = BeautifulSoup(response.text, 'lxml')
 
         # loop to get all the book url in the category
@@ -76,10 +85,14 @@ def get_all_book_from_cat(url_cat, category_name):
         if len(next_page) != 0:
             url_page = next_page[0].find('a', href= True)
             url_page = url_page['href']
-            url_cat_page = url_cat + url_page
+            url_cat = url_cat + url_page
         else:
             break
 
+
+    '''get all category(url)
+       get all the category url and name
+    '''
 def get_all_category(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'lxml')
