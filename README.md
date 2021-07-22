@@ -15,7 +15,7 @@ Les informations récupérer sont les suivantes :
 - review_rating = la note du livre(avis)
 - image_url = l'url de la couverture du livre
 
-Le script permet de sauvegarder les informations des livres dans un fichier csv, il récupère également toutes les catégories et range les livres dans leur propre catégorie. Toutes les images sont des livres sont sauvegarder dans le dossier "images"
+Le script permet de sauvegarder les informations des livres dans un fichier csv, il récupère également toutes les catégories et range les livres dans leur propre catégorie. Toutes les images des livres sont sauvegarder dans le dossier "images"
 
 ## Installation
 
