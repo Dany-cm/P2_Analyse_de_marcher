@@ -15,14 +15,14 @@ Les informations récupérer sont les suivantes :
 - review_rating = la note du livre(avis)
 - image_url = l'url de la couverture du livre
 
-Le script permet de sauvegarder les informations des livres dans un fichier csv, il récupère également toutes les catégorie et range les livres dans leurs propres catégorie. Toutes les images sont des livres sont sauvegarder dans le dossier "images"
+Le script permet de sauvegarder les informations des livres dans un fichier csv, il récupère également toutes les catégories et range les livres dans leur propre catégorie. Toutes les images des livres sont sauvegarder dans le dossier "images"
 
 ## Installation
 
-Installer [Python](https://www.python.org/ftp/python/3.9.6/python-3.9.6-amd64.exe) et suivez les instruction.
+Installer [Python](https://www.python.org/ftp/python/3.9.6/python-3.9.6-amd64.exe) et suivez les instructions.
 
 
-Utilisez [pip](https://pip.pypa.io/en/stable/) pour l'installer les paquets nécessaire.
+Utilisez [pip](https://pip.pypa.io/en/stable/) pour installer les paquets nécessaires.
 
 ```bash
 pip install -r requirements.txt
