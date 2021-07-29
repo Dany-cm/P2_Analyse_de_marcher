@@ -6,10 +6,14 @@ if not os.path.exists(folder_csv):
     os.makedirs(folder_csv)
 
 
+def saveBook(url_book, category_name):
+
     ''' Save book information(url of the book, name of the book category)
         get information for a book and download it into a csv folder
+
+        input url_book(str), category_name(str)
+        output url of the book, name of the category
     '''
-def saveBook(url_book, category_name):
     response = requests.get(url_book)
 
     if response.ok:
@@ -52,11 +56,16 @@ def saveBook(url_book, category_name):
         write.writerow(info)
 
 
+def get_all_book_from_cat(url_cat, category_name):
+
     ''' Get all book from category(url of the category, name of the category)
         save headers in a csv folder and get all books from the category
         if a category has more than one page, visit them and retrieve books
+
+        input url_cat(str), category_name(str)
+        output url of the category, name of the category
     '''
-def get_all_book_from_cat(url_cat, category_name):
+
     # save info in a csv file
     dossier_csv = folder_csv + '/' + category_name + '.csv'
     with open(f'{dossier_csv}', "w", encoding="utf8", newline='') as outf:
@@ -66,7 +75,7 @@ def get_all_book_from_cat(url_cat, category_name):
         # write header
         write.writerow(header)
 
-    print('retrieving all books from cat ' + url_cat)
+    print('Retrieving all books from category ' + url_cat)
 
     # loop in all page
     url_page = "index.html"
@@ -89,11 +98,16 @@ def get_all_book_from_cat(url_cat, category_name):
         else:
             break
 
+def get_all_category(url):
 
+    
     '''get all category(url)
        get all the category url and name
+
+       input get_all_category(str)
+       output all category from the website
     '''
-def get_all_category(url):
+
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'lxml')
 
